@@ -520,9 +520,10 @@ var optionsDefaults = {
 , customEventsHandler: null
 , eventsListenerElement: null
 , onUpdatedCTM: null
-, triggerUpOnLeave: true
-, restrictPanButton: null
-, useGlobalMove: null
+, triggerUpOnLeave: true // This allows content to be panned even if the panning pointer is on top of a menu or outside browser
+, restrictPanButton: null // This restricts pan to specific evt.button
+, restrictPanWhilePointerIsDown: false // This triggers panning only if the pointer is down (ex: only when mouse button is down)
+, useGlobalMove: null // This binds the move listener to the window instead of the element
 }
 
 var passiveListenerOption = {passive: true};
@@ -599,6 +600,8 @@ SvgPanZoom.prototype.setupHandlers = function() {
     , prevEvt = null // use for touchstart event to detect double tap
     ;
 
+  this.isDown = false;
+
   this.eventListeners = {
     // Mouse down group
     mousedown: function(evt) {
@@ -650,6 +653,9 @@ SvgPanZoom.prototype.setupHandlers = function() {
     delete that.eventListeners.mousemove;
     delete that.eventListeners.touchmove;
     that.globalMoveHandler = function(evt) {
+      if (that.options.restrictPanWhilePointerIsDown && !that.isDown) {
+        return;
+      }
       return that.handleMouseMove(evt);
     };
     window.addEventListener('pointermove', that.globalMoveHandler);
@@ -952,6 +958,8 @@ SvgPanZoom.prototype.handleMouseDown = function(evt, prevEvt, source) {
     }
   }
 
+  this.isDown = true;
+
   Utils.mouseAndTouchNormalize(evt, this.svg)
 
   // Double click detection; more consistent than ondblclick
@@ -1001,6 +1009,8 @@ SvgPanZoom.prototype.handleMouseUp = function(evt) {
       evt.returnValue = false
     }
   }
+
+  this.isDown = false;
 
   if (this.state === 'pan') {
     // Quit pan mode
