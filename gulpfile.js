@@ -3,6 +3,7 @@
  */
 var gulp   = require('gulp')
   , watch      = require('gulp-watch')
+  , webpack    = require('gulp-webpack')
   , uglify     = require('gulp-uglify')
   , browserify = require('browserify')
   , source     = require('vinyl-source-stream')
@@ -32,9 +33,21 @@ gulp.task('browserify', function() {
     .pipe(header(banner, {pkg: pkg}))
     .pipe(gulp.dest('./dist/'))
     .pipe(rename('svg-pan-zoom.min.js'))
-    .pipe(uglify())
     .pipe(header(banner, {pkg: pkg}))
     .pipe(gulp.dest('./dist/'))
+});
+
+gulp.task('compile', function() {
+  return gulp.src('./src/svg-pan-zoom.js')
+    .pipe(webpack({
+      entry: './src/svg-pan-zoom.js',
+      output: {
+        library: 'svg-pan-zoom',
+        libraryTarget: 'umd',
+        filename: 'dist/svg-pan-zoom.js',
+      },
+    }))
+    .pipe(gulp.dest('.'));
 });
 
 /**
