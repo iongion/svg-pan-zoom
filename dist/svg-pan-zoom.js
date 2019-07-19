@@ -866,6 +866,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	}
 
+	svgPanZoom.SvgUtils = SvgUtils;
+
 	module.exports = svgPanZoom;
 
 

@@ -810,4 +810,6 @@ var svgPanZoom = function(elementOrSelector, options){
   }
 }
 
+svgPanZoom.SvgUtils = SvgUtils;
+
 module.exports = svgPanZoom;
